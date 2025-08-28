@@ -1,0 +1,6 @@
+name: Config Two
+version: 2.0
+settings:
+  debug: false
+  environment: production
+  service: service2

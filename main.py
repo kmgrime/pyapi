@@ -2,19 +2,26 @@
 from fastapi import FastAPI
 # Import PyYAML library for reading YAML files
 import yaml
+# Import Path for handling file paths
+from pathlib import Path
 
 # Create a FastAPI application instance
 app = FastAPI()
 
-# Define a function that reads and parses YAML files
-def read_yaml(file_path: str):
-    # Open the file in read mode using a context manager (automatically closes the file)
-    with open(file_path, 'r') as file:
-        # Parse the YAML content and return it as a Python dictionary
-        return yaml.safe_load(file)
+# Define the configs directory path
+CONFIGS_DIR = Path("configs")
 
-# Define a GET endpoint at the path "/config"
-@app.get("/config")
-async def get_config():
-    # When this endpoint is called, read and return the contents of config.yaml
-    return read_yaml('config.yaml')
+# Define a GET endpoint that reads all configs from the directory
+@app.get("/configs")
+async def get_configs():
+    # Dictionary to store all configurations
+    all_configs = {}
+    
+    # Read each YAML file in the configs directory
+    for config_file in CONFIGS_DIR.glob("*.yaml"):
+        with open(config_file, 'r') as file:
+            # Use the filename (without .yaml) as the key
+            config_name = config_file.stem
+            all_configs[config_name] = yaml.safe_load(file)
+    
+    return all_configs
